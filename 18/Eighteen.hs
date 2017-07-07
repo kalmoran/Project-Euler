@@ -15,8 +15,8 @@ recursiveSolver [] (xs:xss) = recursiveSolver xs xss
 recursiveSolver xs []       = xs
 recursiveSolver xs (ys:yss) = recursiveSolver (mergeRows xs ys) yss
 
-solver = do
- nums <- readFile "/home/server/Asztal/Project Euler/18/input" >>= (return . parseInput)
+solver inputFilePath = do
+ nums <- readFile inputFilePath >>= (return . parseInput)
  print (foldr (max) 0 (recursiveSolver [] (nums))) 
  
 
