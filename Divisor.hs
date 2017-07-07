@@ -3,7 +3,7 @@
 {-# LANGUAGE ConstraintKinds   #-}
 
 module Divisor (
-                 DivisionData
+                 DivisionData(Pr,DIVS)
                , Division
                , MonadDivisor (..)
                , runDivision
