@@ -57,25 +57,29 @@ instance Monad Division where
  (>>=) m b = Div $ runDiv m >>= runDiv . b
 
 class Monad m => MonadDivisor m where
- getDivisors  :: Integer -> m DivisionData
- isPrime      :: Integer -> m Bool
+ getDivisors      :: Integer -> m DivisionData
+ isPrime          :: Integer -> m Bool
+ getPrimesTillCap :: Integer -> m [Integer]
  
 instance MonadDivisor m => MonadDivisor (StateT s m) where
- getDivisors = lift . getDivisors
- isPrime     = lift . isPrime 
+ getDivisors      = lift . getDivisors
+ isPrime          = lift . isPrime 
+ getPrimesTillCap = lift . getPrimesTillCap
 
 instance MonadDivisor m => MonadDivisor (ReaderT r m) where
- getDivisors = lift . getDivisors
- isPrime     = lift . isPrime 
+ getDivisors      = lift . getDivisors
+ isPrime          = lift . isPrime 
+ getPrimesTillCap = lift . getPrimesTillCap
  
 instance (Monoid w, MonadDivisor m) => MonadDivisor (WriterT w m) where
- getDivisors = lift . getDivisors
- isPrime     = lift . isPrime
- 
+ getDivisors      = lift . getDivisors
+ isPrime          = lift . isPrime 
+ getPrimesTillCap = lift . getPrimesTillCap
+
 instance MonadDivisor Division where
- getDivisors = Div . getDivisors'
- isPrime     = Div . isPrime'
- 
+ getDivisors      = Div . getDivisors'
+ isPrime          = Div . isPrime'
+ getPrimesTillCap = Div . getPrimesTillCap' 
 
 runDivision :: Division a -> UnionF -> Integer -> IO (a, DivisionStateData)
 runDivision (Div div) unionF initialCap = newDivisonState initialCap >>= runStateT (runReaderT div unionF) 
@@ -111,6 +115,10 @@ isPrime' n = do
  case divData of
   (Pr)            -> return True
   (DIVS _)        -> return False
+
+
+getPrimesTillCap' :: Integer -> DivisionStack [Integer]
+getPrimesTillCap' cap = getDivisors' cap >> gets primes >>= return . reverse . (dropWhile (> cap)) . reverse
 
 getDivisors' :: Integer -> DivisionStack DivisionData
 getDivisors' n = do
